@@ -1,0 +1,6 @@
+# Python virtual environemnt
+.venv/
+venv/
+
+# IDE folders
+.idea/
