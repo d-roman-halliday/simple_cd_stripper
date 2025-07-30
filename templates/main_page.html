@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple CD Stripper</title>
+</head>
+<body>
+<h1>Input</h1>
+<h2>Enter Discogs Release or Master URL</h2>
+<p>
+    Something like: <code>https://www.discogs.com/master/41155-Ozzy-Osbourne-Blizzard-Of-Ozz</code>
+</p>
+<ul>
+    <li>One Disk: <code>https://www.discogs.com/master/1326585-Jimmy-Ponder-While-My-Guitar-Gently-Weeps</code></li>
+    <li>Multi Disk: <code>https://www.discogs.com/release/3992501-Various-While-My-Guitar-Gently-Weeps</code></li>
+</ul>
+<form method="post" action="/generate-label">
+    <label>Release or Master URL
+        <input type="text" name="url" placeholder="https://www.discogs.com/release/..." style="width: 400px" required>
+    </label>
+    <button type="submit">Generate PDF</button>
+</form>
+<h1>About</h1>
+<h2>The Jukebox</h2>
+<p>
+    This is inspired by a Sound Leisure Lime-Light CD jukebox (which olds 80 CDs): <a href="https://www.jukebox-world.de/Forum/Archiv/Sound%20Leisure/SoundLeisure-StarDust.htm">Sound Leisure im Archiv Jukebox-World</a>
+</p>
+<h3>Label space</h3>
+<ul>
+    <li>Track Listing width: <var>7.5</var>cm</li>
+    <li>Track Listing height: <var>10.5</var>cm</li>
+    <li>Plus spaces for the CD book/cover art</li>
+</ul>
+<h3>General specs of this jukebox</h3>
+<ul>
+    <li>21st Century Mechanism</li>
+    <li>Lightest wallmount jukebox available holding 80 discs</li>
+    <li>Most compact dimensions of any wallbox holding 80 discs</li>
+    <li>80 discs, 80 displays</li>
+    <li>Mechanism completely enclosed by its own dust cover to prevent dirt and dust on disc's</li>
+    <li>Low level coin mech entry</li>
+    <li>Internal fitting Slave Amp and CDV decoder, 80 disk 80 display, 24hr real time clock (BGM)</li>
+    <li>Random play via keyboard</li>
+    <li>Twin Channel amp</li>
+    <li>Spare position for a Slave Amp Mic input, Aux Input /Aux Output</li>
+    <li>Faulty disc diagnostic</li>
+    <li>Simple popularity read out via LED display</li>
+    <li>Drives all Sound Leisure wall boxes</li>
+    <li>Stand available</li>
+    <li>Track lockout facility</li>
+    <li>H1020 x W638 x D310 mm; 60 kg</li>
+</ul>
+<h2>Project</h2>
+<p>
+    Inspired by the PHP project I have:
+</p>
+<ul>
+    <li><a href="https://simplestripper.roman-halliday.com/">simplestripper.roman-halliday.com</a></li>
+    <li><a href="https://github.com/d-roman-halliday/simplestripper">github.com/d-roman-halliday/simplestripper</a></li>
+</ul>
+<p>
+    Created with some vibe coding (how times changed over two years). This is to fill a personal need, but who knows how it might be useful to others.
+</p>
+
+</body>
+</html>

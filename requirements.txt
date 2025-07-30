@@ -1,0 +1,4 @@
+Flask>=2.3
+discogs-client>=2.2
+fpdf2>=2.7
+python-dotenv>=1.0
