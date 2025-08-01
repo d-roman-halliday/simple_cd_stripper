@@ -196,6 +196,7 @@ DEFAULT_FONT_SIZE_ARTIST = 12
 DEFAULT_FONT_SIZE = 10
 MIN_FONT_SIZE = 6
 ALTERNATE_COLOR = (255, 255, 200)  # Light yellow in RGB
+STRIP_BRACKETS = True # For now some titles have brackets in them which contain extra information and make them too long, strip them out
 
 def generate_pdf(
     data: List[DiscData], 
@@ -225,24 +226,28 @@ def generate_pdf(
         pdf.set_draw_color(r=255, g=0, b=255)
         pdf.set_text_color(r=255, g=0, b=255)
 
-        def add_crop_marks(x: float, y: float, right_ring=True, left_wing=True) -> None:
-            # Crop marks should be outside so not seen in content
+        def add_crop_marks(x: float, y: float, right_wing=True, left_wing=True, bottom_wing=True, top_wing=True) -> None:
+            # Crop marks should be outside so not seen in the content
             # Top left
-            pdf.line(x, y, x - 5, y)
+            if top_wing:
+                pdf.dashed_line(x, y, x - 5, y)
             if left_wing:
-                pdf.line(x, y, x, y - 5)
+                pdf.dashed_line(x, y, x, y - 5)
             # Top right
-            if right_ring:
-                pdf.line(x + TRACK_STRIP_WIDTH, y, x + TRACK_STRIP_WIDTH + 5, y)
-            pdf.line(x + TRACK_STRIP_WIDTH, y, x + TRACK_STRIP_WIDTH, y - 5)
+            if right_wing:
+                pdf.dashed_line(x + TRACK_STRIP_WIDTH, y, x + TRACK_STRIP_WIDTH + 5, y)
+            if top_wing:
+                pdf.dashed_line(x + TRACK_STRIP_WIDTH, y, x + TRACK_STRIP_WIDTH, y - 5)
             # Bottom left
-            pdf.line(x, y + TRACK_STRIP_HEIGHT, x - 5, y + TRACK_STRIP_HEIGHT)
+            if bottom_wing:
+                pdf.dashed_line(x, y + TRACK_STRIP_HEIGHT, x - 5, y + TRACK_STRIP_HEIGHT)
             if left_wing:
-                pdf.line(x, y + TRACK_STRIP_HEIGHT, x, y + TRACK_STRIP_HEIGHT + 5)
+                pdf.dashed_line(x, y + TRACK_STRIP_HEIGHT, x, y + TRACK_STRIP_HEIGHT + 5)
             # Bottom right
-            pdf.line(x + TRACK_STRIP_WIDTH, y + TRACK_STRIP_HEIGHT, x + TRACK_STRIP_WIDTH + 5, y + TRACK_STRIP_HEIGHT)
-            if right_ring:
-                pdf.line(x + TRACK_STRIP_WIDTH, y + TRACK_STRIP_HEIGHT, x + TRACK_STRIP_WIDTH, y + TRACK_STRIP_HEIGHT + 5)
+            if bottom_wing:
+                pdf.dashed_line(x + TRACK_STRIP_WIDTH, y + TRACK_STRIP_HEIGHT, x + TRACK_STRIP_WIDTH + 5, y + TRACK_STRIP_HEIGHT)
+            if right_wing:
+                pdf.dashed_line(x + TRACK_STRIP_WIDTH, y + TRACK_STRIP_HEIGHT, x + TRACK_STRIP_WIDTH, y + TRACK_STRIP_HEIGHT + 5)
 
         def find_fitting_font_size(text: str, max_width: float,
                                    font_family=DEFAULT_FONT,
@@ -296,26 +301,34 @@ def generate_pdf(
             
             return current_y - y  # Return total height used
 
+        # Create page
+        pdf.add_page()
+
+        # Plot & add content
         starting_x, starting_y = 10, 10
         # idx will range from 0 to len(data)-1, two strips per page
         total_iterations=len(data)-1
         for idx, disc in enumerate(data):
-            if idx % 2 == 0:
-                pdf.add_page()
+            # Calculate position based on index (0-3 for each page)
+            page_position = idx % 4  # Will be 0, 1, 2, or 3
+            if page_position == 0:
+                # Top left
                 x, y = starting_x, starting_y
-
-                right_wing_show = True
-                if total_iterations == 2:
-                    right_wing_show=False
-
-                add_crop_marks(x, y, right_ring=right_wing_show)
-            else:
+            elif page_position == 1:
+                # Top right
                 x, y = starting_x + TRACK_STRIP_WIDTH, starting_y
-                add_crop_marks(x, y, right_ring=True, left_wing=False)
+            elif page_position == 2:
+                # Bottom left
+                x, y = starting_x, starting_y + TRACK_STRIP_HEIGHT
+            elif page_position == 3:
+                # Bottom right
+                x, y = starting_x + TRACK_STRIP_WIDTH, starting_y + TRACK_STRIP_HEIGHT
+            else:  # More than 4 strips to a page. Ignore them for now
+                continue
 
             # Add crop marks
+            add_crop_marks(x, y)
 
-            
             # Calculate available space
             content_x = x + MARGIN
             content_y = y + MARGIN
@@ -353,6 +366,11 @@ def generate_pdf(
                     pdf.set_fill_color(255, 255, 255)
                 
                 track_text = f"{track.track_number:02d} {track.title}"
+
+                # Remove any text in brackets
+                if STRIP_BRACKETS:
+                    track_text = track_text.split("(")[0].strip()
+
                 pdf.set_font(DEFAULT_FONT, size=DEFAULT_FONT_SIZE)
                 track_font_size = find_fitting_font_size(track_text, content_width)
                 # noinspection PyTypeChecker

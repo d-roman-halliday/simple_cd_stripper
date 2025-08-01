@@ -1,6 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Simple CD Stripper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .url-input-container {
+            margin-bottom: 10px;
+        }
+        .url-input {
+            width: 80%;
+            padding: 8px;
+            margin-right: 10px;
+        }
+        .remove-url {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        #add-url {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        #submit-form {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+        .error {
+            color: red;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Simple CD Stripper</h1>
+<p>Enter Discogs URLs to generate CD labels:</p>
+
+<form id="url-form" action="/generate-label" method="post">
+    <div id="url-inputs">
+        <div class="url-input-container">
+            <label>URL:
+                <input type="text" class="url-input" name="url[]" placeholder="Enter Discogs URL" required>
+            </label>
+        </div>
+    </div>
+    <button type="button" id="add-url">+ Add Another URL</button>
+    <br>
+    <button type="submit" id="submit-form">Generate Labels</button>
+</form>
+
+<div id="error-message" class="error"></div>
+
+<script>
+    document.getElementById('add-url').addEventListener('click', function() {
+        const container = document.createElement('div');
+        container.className = 'url-input-container';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'url-input';
+        input.name = 'url[]';
+        input.placeholder = 'Enter Discogs URL';
+        input.required = true;
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'remove-url';
+        removeButton.textContent = '✕';
+        removeButton.onclick = function() {
+            container.remove();
+        };
+
+        container.appendChild(input);
+        container.appendChild(removeButton);
+        document.getElementById('url-inputs').appendChild(container);
+    });
+
+    document.getElementById('url-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const inputs = document.getElementsByClassName('url-input');
+        const urls = Array.from(inputs).map(input => input.value.trim()).filter(url => url);
+
+        if (urls.length === 0) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = 'Please enter at least one URL';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        // Create form data with all URLs
+        const formData = new FormData();
+        formData.append('url', urls.join(','));
+
+        // Submit the form
+        fetch('/generate-label', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to generate labels');
+                    });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'jukebox_labels.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            })
+            .catch(error => {
+                const errorDiv = document.getElementById('error-message');
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+            });
+    });
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <title>Simple CD Stripper</title>
 </head>
@@ -23,31 +167,18 @@
 <h1>About</h1>
 <h2>The Jukebox</h2>
 <p>
-    This is inspired by a Sound Leisure Lime-Light CD jukebox (which olds 80 CDs): <a href="https://www.jukebox-world.de/Forum/Archiv/Sound%20Leisure/SoundLeisure-StarDust.htm">Sound Leisure im Archiv Jukebox-World</a>
+    This is inspired by a Sound Leisure Lime-Light CD jukebox (which olds 80 CDs): <a href="https://www.jukebox-world.de/Forum/Archiv/Sound%20Leisure/SoundLeisure-StarDust.htm">Sound Leisure im Archive Jukebox-World</a>
 </p>
 <h3>Label space</h3>
 <ul>
-    <li>Track Listing width: <var>7.5</var>cm</li>
-    <li>Track Listing height: <var>10.5</var>cm</li>
+    <li>Track Listing width: <var>7.5</var>cm. I've found working for the PDF: <var>74</var>mm</li>
+    <li>Track Listing height: <var>11.5</var>cm. I've found working for the PDF: <var>109</var>mm</li>
     <li>Plus spaces for the CD book/cover art</li>
 </ul>
 <h3>General specs of this jukebox</h3>
 <ul>
-    <li>21st Century Mechanism</li>
-    <li>Lightest wallmount jukebox available holding 80 discs</li>
-    <li>Most compact dimensions of any wallbox holding 80 discs</li>
-    <li>80 discs, 80 displays</li>
-    <li>Mechanism completely enclosed by its own dust cover to prevent dirt and dust on disc's</li>
-    <li>Low level coin mech entry</li>
-    <li>Internal fitting Slave Amp and CDV decoder, 80 disk 80 display, 24hr real time clock (BGM)</li>
-    <li>Random play via keyboard</li>
-    <li>Twin Channel amp</li>
-    <li>Spare position for a Slave Amp Mic input, Aux Input /Aux Output</li>
-    <li>Faulty disc diagnostic</li>
-    <li>Simple popularity read out via LED display</li>
-    <li>Drives all Sound Leisure wall boxes</li>
-    <li>Stand available</li>
-    <li>Track lockout facility</li>
+    <li>Cards: 75 mm wide 111 mm high</li>
+    <li>Album art boxes</li>
     <li>H1020 x W638 x D310 mm; 60 kg</li>
 </ul>
 <h2>Project</h2>
