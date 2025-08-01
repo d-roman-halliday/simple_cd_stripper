@@ -369,7 +369,7 @@ def generate_pdf(
 
                 # Remove any text in brackets
                 if STRIP_BRACKETS:
-                    track_text = track_text.split("(")[0].strip()
+                    track_text = re.sub(r'\([^)]*\)', '', track_text).strip()
 
                 pdf.set_font(DEFAULT_FONT, size=DEFAULT_FONT_SIZE)
                 track_font_size = find_fitting_font_size(track_text, content_width)
