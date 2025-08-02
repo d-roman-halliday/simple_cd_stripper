@@ -222,9 +222,13 @@ def generate_pdf(
         pdf.set_auto_page_break(auto=False)
         pdf.set_margins(10, 10, 10)
 
-        # pdf.set_draw_color(0) # Black
-        pdf.set_draw_color(r=255, g=0, b=255)
-        pdf.set_text_color(r=255, g=0, b=255)
+        # All text is black
+        pdf.set_draw_color(0) # Black
+        pdf.set_text_color(0) # Black
+
+        # I'm out of black ink - use Magenta
+        #pdf.set_draw_color(r=255, g=0, b=255)
+        #pdf.set_text_color(r=255, g=0, b=255)
 
         def add_crop_marks(x: float, y: float, right_wing=True, left_wing=True, bottom_wing=True, top_wing=True) -> None:
             # Crop marks should be outside so not seen in the content
