@@ -2,9 +2,15 @@
 
 A simple python (using fpdf and flask) app to connect to discogs.com and download contents to build labels for a Jukebox.
 
-lots of docs in the [main_page](templates/main_page.html) HTML file.
+Some docs in the [main_page](templates/main_page.html) HTML file.
+
+You can see it in action at: https://simple-cd-stripper.roman-halliday.com/
 
 Mostly built with AI/LLM development.
+
+Inspired by my 7" labels project:
+* https://simplestripper.roman-halliday.com/
+* https://github.com/d-roman-halliday/simplestripper
 
 ## Deployment Notes - Apache WSGI
 
@@ -13,6 +19,22 @@ As I'm hosting this on apache (which always seems to be a battle with flask and 
 create a `<site_dir>` under `/var/www/`, this can just be `simple_cd_stripper` (or just create straight under `/var/www/`) if you don't have other sites on the host, but it's nice (in my opinion) to keep the `venv` and the site together somewhere.
 
 Note the difference between underscores and hyphens... The hostname (if using LetsEncrypt) can't contain underscores, so instead I'm using `simple-cd-stripper` for the hostname.
+
+### Updates
+
+Putting at the top as a reminder.
+
+Update content, then reload `apache`.
+
+```shell
+cd /var/www/<site_dir>
+cd simple_cd_stripper
+
+git pull
+
+# Or the changes won't show
+sudo systemctl reload apache2
+```
 
 ### Get files & setup venv
 
