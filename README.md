@@ -32,7 +32,10 @@ cd simple_cd_stripper
 
 git pull
 
-# Or the changes won't show
+# Youch the wsgi file to refresh apache
+touch simple_cd_stripper.wsgi
+
+# Or, if the changes won't show
 sudo systemctl reload apache2
 ```
 
