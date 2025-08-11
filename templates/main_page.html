@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <title>Simple CD Stripper</title>
+    <meta charset="UTF-8">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -48,6 +49,13 @@
             display: none;
             margin-top: 10px;
         }
+        .options {
+            margin: 12px 0 18px;
+        }
+        .options label {
+            user-select: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -62,6 +70,14 @@
             </label>
         </div>
     </div>
+
+    <div class="options">
+        <label>
+            <input type="checkbox" name="title_bg" value="1">
+            Yellow background behind title/artist
+        </label>
+    </div>
+
     <button type="button" id="add-url">+ Add Another URL</button>
     <br>
     <button type="submit" id="submit-form">Generate Labels</button>
@@ -97,6 +113,11 @@
     document.getElementById('url-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // Options
+        const options = document.getElementsByClassName('options');
+        const titleBg = options[0].querySelector('input[name="title_bg"]').checked;
+
+        // URLs
         const inputs = document.getElementsByClassName('url-input');
         const urls = Array.from(inputs).map(input => input.value.trim()).filter(url => url);
 
@@ -110,6 +131,9 @@
         // Create form data with all URLs
         const formData = new FormData();
         formData.append('url', urls.join(','));
+
+        // Append options to the form data
+        formData.append('title_bg', titleBg);
 
         // Submit the form
         fetch('/generate-label', {
@@ -141,16 +165,9 @@
             });
     });
 </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Simple CD Stripper</title>
-</head>
-<body>
-<h1>Input</h1>
-<h2>Enter Discogs Release or Master URL</h2>
+
+<h1>Instructions</h1>
+<h2>1: Enter Discogs Release or Master URL</h2>
 <p>
     Something like: <code>https://www.discogs.com/master/41155-Ozzy-Osbourne-Blizzard-Of-Ozz</code>
 </p>
@@ -158,12 +175,16 @@
     <li>One Disk: <code>https://www.discogs.com/master/1326585-Jimmy-Ponder-While-My-Guitar-Gently-Weeps</code></li>
     <li>Multi Disk: <code>https://www.discogs.com/release/3992501-Various-While-My-Guitar-Gently-Weeps</code></li>
 </ul>
-<form method="post" action="/generate-label">
-    <label>Release or Master URL
-        <input type="text" name="url" placeholder="https://www.discogs.com/release/..." style="width: 400px" required>
-    </label>
-    <button type="submit">Generate PDF</button>
-</form>
+
+<h2>2: Add more URLs (optional)</h2>
+<p>
+    Use the "+ Add Another URL" button to add another URL (4 disks max per output)
+</p>
+<h2>3: Generate</h2>
+<p>
+    Use the "Generate Labels" button and you should have a PDF with some tracks on it
+</p>
+
 <h1>About</h1>
 <h2>The Jukebox</h2>
 <p>
@@ -198,5 +219,6 @@
     <li><a href="https://simplestripper.roman-halliday.com/">simplestripper.roman-halliday.com</a></li>
     <li><a href="https://github.com/d-roman-halliday/simplestripper">github.com/d-roman-halliday/simplestripper</a></li>
 </ul>
+
 </body>
 </html>

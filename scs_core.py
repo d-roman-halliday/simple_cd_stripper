@@ -201,7 +201,8 @@ STRIP_BRACKETS = True # For now some titles have brackets in them which contain 
 def generate_pdf(
     data: List[DiscData], 
     output_path: Optional[str] = None,
-    alternate_backgrounds: bool = False
+    alternate_backgrounds: bool = False,
+    show_title_bg: bool = False
 ) -> Optional[BytesIO]:
     """
     Generate a PDF with the album information.
@@ -252,6 +253,23 @@ def generate_pdf(
                 pdf.dashed_line(x + TRACK_STRIP_WIDTH, y + TRACK_STRIP_HEIGHT, x + TRACK_STRIP_WIDTH + 5, y + TRACK_STRIP_HEIGHT)
             if right_wing:
                 pdf.dashed_line(x + TRACK_STRIP_WIDTH, y + TRACK_STRIP_HEIGHT, x + TRACK_STRIP_WIDTH, y + TRACK_STRIP_HEIGHT + 5)
+
+        def create_album_artist_background(x: float, y: float) -> None:
+            """Create a background image for the album artist."""
+            # This can go as an option elsewhere
+            TITLE_BG_COLOR: Tuple[int, int, int] = (255, 230, 128)  # soft yellow
+            TITLE_BG_MARGIN: float = 2
+
+            background_color=TITLE_BG_COLOR
+            #plot points
+            tl_x = x - TITLE_BG_MARGIN
+            tl_y = y + TITLE_BG_MARGIN
+            br_x_length = TITLE_BG_MARGIN + TRACK_STRIP_WIDTH + TITLE_BG_MARGIN
+            br_y_length = 15 - ( 2 * TITLE_BG_MARGIN)
+            # Draw filled rectangle
+            r, g, b = background_color
+            pdf.set_fill_color(r, g, b)
+            pdf.rect(tl_x, tl_y, br_x_length, br_y_length, style="F")
 
         def find_fitting_font_size(text: str, max_width: float,
                                    font_family=DEFAULT_FONT,
@@ -305,6 +323,9 @@ def generate_pdf(
             
             return current_y - y  # Return total height used
 
+        ########################################################################
+        # Main steps
+        ########################################################################
         # Create page
         pdf.add_page()
 
@@ -339,6 +360,10 @@ def generate_pdf(
             content_width = TRACK_STRIP_WIDTH - (2 * MARGIN)
 
             current_y = content_y
+
+            # Add background for Title/Artist
+            if show_title_bg:
+                create_album_artist_background(x, y)
             
             # Add Disk title
             title_disk = f"{disc.album}"
