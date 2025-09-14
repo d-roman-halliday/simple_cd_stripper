@@ -73,8 +73,13 @@
 
     <div class="options">
         <label>
-            <input type="checkbox" name="title_bg" value="1">
+            <input type="checkbox" name="title_bg" value="1" checked>
             Yellow background behind title/artist
+        </label>
+        <br>
+        <label>
+            <input type="checkbox" name="show_ruler" value="1">
+            Print a ruler (in mm) to check the label size/paper printout is correct
         </label>
     </div>
 
@@ -116,6 +121,7 @@
         // Options
         const options = document.getElementsByClassName('options');
         const titleBg = options[0].querySelector('input[name="title_bg"]').checked;
+        const showRuler = options[0].querySelector('input[name="show_ruler"]').checked;
 
         // URLs
         const inputs = document.getElementsByClassName('url-input');
@@ -134,6 +140,7 @@
 
         // Append options to the form data
         formData.append('title_bg', titleBg);
+        formData.append('show_ruler', showRuler);
 
         // Submit the form
         fetch('/generate-label', {

@@ -156,6 +156,10 @@ def fetch_release_data(id_type: str, discogs_id: int) -> List[DiscData]:
         # First pass: Parse all tracks to determine disc structure
         for track in release.tracklist:
             disc_num, track_num, overall_num = _parse_track_position(track.position, track_map)
+
+            # Skip 'Bonus Tracks' lable/info rows from listing
+            if track_num == 0 and overall_num == 0:
+                continue
             
             if disc_num not in discs:
                 discs[disc_num] = DiscData(
@@ -202,7 +206,8 @@ def generate_pdf(
     data: List[DiscData], 
     output_path: Optional[str] = None,
     alternate_backgrounds: bool = False,
-    show_title_bg: bool = False
+    show_title_bg: bool = False,
+    show_ruler: bool = False,
 ) -> Optional[BytesIO]:
     """
     Generate a PDF with the album information.
@@ -211,6 +216,8 @@ def generate_pdf(
         data: List of DiscData objects containing album information
         output_path: Optional path to save the PDF file
         alternate_backgrounds: Whether to use alternating backgrounds for tracks
+        show_title_bg: Whether to add a background for the album title and artist
+        show_ruler: Whether to draw a ruler to help visualize the sizing in the PDF print
     
     Returns:
         BytesIO object containing the PDF if output_path is None, None otherwise
@@ -230,6 +237,18 @@ def generate_pdf(
         # I'm out of black ink - use Magenta
         #pdf.set_draw_color(r=255, g=0, b=255)
         #pdf.set_text_color(r=255, g=0, b=255)
+
+        def draw_ruler(x: float, y: float, width: float) -> None:
+            """Draw a ruled line. Include markings for each mm"""
+            pdf.line(x, y, x+width, y)
+            mm_count = width
+            mm_point = 0
+            while mm_point <= mm_count:
+                draw_height = 1
+                if mm_point % 10 == 0:
+                    draw_height = 3
+                pdf.line(x+mm_point, y, x+mm_point, y+draw_height)
+                mm_point+=1
 
         def add_crop_marks(x: float, y: float, right_wing=True, left_wing=True, bottom_wing=True, top_wing=True) -> None:
             # Crop marks should be outside so not seen in the content
@@ -328,6 +347,12 @@ def generate_pdf(
         ########################################################################
         # Create page
         pdf.add_page()
+
+        # Visual debugging:
+        # To be checked with a ruler to make sure that printout is in correct proportions
+        # Printers/drivers/settings resize things to be helpful (but measurements need to fit)
+        if show_ruler:
+            draw_ruler(x=10, y=20+(2*TRACK_STRIP_HEIGHT), width=TRACK_STRIP_WIDTH)
 
         # Plot & add content
         starting_x, starting_y = 10, 10

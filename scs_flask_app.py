@@ -36,6 +36,9 @@ def generate_label():
         # Determine whether to show the yellow background for title/artist
         show_title_bg = bool(request.form.get('title_bg')=='true')
 
+        # Determine whether to show the ruler (checking printout is not scaled incorrectly)
+        show_ruler = bool(request.form.get('show_ruler') == 'true')
+
         ########################################################################
         # Process
         ########################################################################
@@ -58,7 +61,10 @@ def generate_label():
                 "details": errors
             }), 400
 
-        pdf_buf = generate_pdf(all_disc_data, show_title_bg=show_title_bg)
+        pdf_buf = generate_pdf(all_disc_data,
+                               show_title_bg=show_title_bg,
+                               show_ruler=show_ruler
+                              )
 
         # Send PDF
         response = send_file(
