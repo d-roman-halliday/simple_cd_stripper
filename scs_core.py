@@ -359,6 +359,10 @@ def generate_pdf(
         # idx will range from 0 to len(data)-1, two strips per page
         total_iterations=len(data)-1
         for idx, disc in enumerate(data):
+            if idx >= 4:
+                # Not supporting more than 4 CDs on one page for now
+                print('Warning: More than 4 disks; Ignoring extra disks/data')
+                break
             # Calculate position based on index (0-3 for each page)
             page_position = idx % 4  # Will be 0, 1, 2, or 3
             if page_position == 0:
@@ -398,6 +402,8 @@ def generate_pdf(
 
             # Add Disk artist
             title_artist = f"{disc.artist}"
+            # Discogs ads a number to the name of the artist (if there is more than one artist with the same name), remove it if present:
+            title_artist = re.sub(r'\([^)]*\)', '', title_artist).strip()
             title_font_size = find_fitting_font_size(title_artist, content_width, font_style='B', initial_size=DEFAULT_FONT_SIZE_ARTIST)
             title_height = write_text_box(title_artist, content_x, current_y, content_width, font_style='B', font_size=title_font_size)
             current_y = content_y + title_height
